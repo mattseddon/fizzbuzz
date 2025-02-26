@@ -1,29 +1,40 @@
 use clap::Parser;
-use std::thread;
+use std::{fmt, thread};
 
-/// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
 struct Cli {
     iter_to: i64,
 }
 
-enum FizzBuzz {
+#[derive(PartialEq, Debug)]
+enum Output {
     Fizz,
     Buzz,
     FizzBuzz,
     Number(i64),
 }
 
-fn fizz_buzz(n: i64) -> String {
-    match (n % 3 == 0, n % 5 == 0) {
-        (true, true) => String::from("FizzBuzz"),
-        (true, false) => String::from("Fizz"),
-        (false, true) => String::from("Buzz"),
-        (false, false) => n.to_string(),
+impl fmt::Display for Output {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Output::Fizz => write!(f, "Fizz"),
+            Output::Buzz => write!(f, "Buzz"),
+            Output::FizzBuzz => write!(f, "FizzBuzz"),
+            Output::Number(n) => write!(f, "{}", n),
+        }
     }
 }
 
-fn threaded_fizz_buzz(n: i64) -> Vec<String> {
+fn fizz_buzz(n: i64) -> Output {
+    match (n % 3 == 0, n % 5 == 0) {
+        (true, true) => Output::FizzBuzz,
+        (true, false) => Output::Fizz,
+        (false, true) => Output::Buzz,
+        (false, false) => Output::Number(n),
+    }
+}
+
+fn threaded_fizz_buzz(n: i64) -> Vec<Output> {
     let mut handles = Vec::new();
     for i in 1..n {
         let handle = thread::spawn(move || fizz_buzz(i));
@@ -65,7 +76,7 @@ mod tests {
             if i % 3 == 0 || i % 5 == 0 {
                 continue;
             }
-            assert_eq!(fizz_buzz(i), i.to_string());
+            assert_eq!(fizz_buzz(i), Output::Number(i));
         }
     }
 
@@ -75,7 +86,7 @@ mod tests {
             if i % 5 == 0 {
                 continue;
             }
-            assert_eq!(fizz_buzz(i * 3), "Fizz");
+            assert_eq!(fizz_buzz(i * 3), Output::Fizz);
         }
     }
 
@@ -86,14 +97,14 @@ mod tests {
                 continue;
             }
 
-            assert_eq!(fizz_buzz(i * 5), "Buzz");
+            assert_eq!(fizz_buzz(i * 5), Output::Buzz);
         }
     }
 
     #[test]
     fn test_fizz_buzz() {
         for i in 1..20 {
-            assert_eq!(fizz_buzz(i * 3 * 5), "FizzBuzz");
+            assert_eq!(fizz_buzz(i * 3 * 5), Output::FizzBuzz);
         }
     }
 
