@@ -54,13 +54,15 @@ fn main() {
 
     println!("running fizz buzz up to {:?} in a sane loop", args.iter_to);
 
-    for i in 1..args.iter_to {
+    let iter_to = args.iter_to + 1;
+
+    for i in 1..iter_to {
         println!("{}", fizz_buzz(i));
     }
 
     println!("now do with threadz.... booooiiiiiiiiii");
 
-    for i in threaded_fizz_buzz(args.iter_to) {
+    for i in threaded_fizz_buzz(iter_to) {
         println!("{}", i);
     }
 }
