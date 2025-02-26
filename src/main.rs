@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::thread;
 
 /// Search for a pattern in a file and display the lines that contain it.
 #[derive(Parser)]
@@ -18,6 +19,23 @@ fn fizz_buzz(n: i64) -> String {
     }
 }
 
+fn make_parallel(n: i64) {
+    let mut handles = Vec::new();
+    for i in 1..n {
+        let handle = thread::spawn(move || fizz_buzz(i));
+        handles.push(handle);
+    }
+
+    let mut results = Vec::new();
+    for handle in handles {
+        results.push(handle.join().unwrap());
+    }
+
+    for i in results {
+        println!("{}", i);
+    }
+}
+
 fn main() {
     let args = Cli::parse();
 
@@ -26,6 +44,9 @@ fn main() {
     for i in 1..args.iter_to {
         println!("{}", fizz_buzz(i));
     }
+
+    println!("now do with threadz.... booooiiiiiiiiii");
+    make_parallel(args.iter_to);
 }
 
 #[cfg(test)]
