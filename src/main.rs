@@ -19,7 +19,7 @@ fn fizz_buzz(n: i64) -> String {
     }
 }
 
-fn make_parallel(n: i64) {
+fn make_parallel(n: i64) -> Vec<String> {
     let mut handles = Vec::new();
     for i in 1..n {
         let handle = thread::spawn(move || fizz_buzz(i));
@@ -31,22 +31,24 @@ fn make_parallel(n: i64) {
         results.push(handle.join().unwrap());
     }
 
-    for i in results {
-        println!("{}", i);
-    }
+    results
 }
 
 fn main() {
     let args = Cli::parse();
 
-    println!("running fizz buzz up to {:?}", args.iter_to);
+    println!("running fizz buzz up to {:?} in a sane loop", args.iter_to);
 
     for i in 1..args.iter_to {
         println!("{}", fizz_buzz(i));
     }
 
     println!("now do with threadz.... booooiiiiiiiiii");
-    make_parallel(args.iter_to);
+
+    let parallel = make_parallel(args.iter_to);
+    for i in parallel {
+        println!("{}", i);
+    }
 }
 
 #[cfg(test)]
@@ -89,6 +91,14 @@ mod tests {
     fn test_fizz_buzz() {
         for i in 1..20 {
             assert_eq!(fizz_buzz(i * 3 * 5), "FizzBuzz");
+        }
+    }
+
+    #[test]
+    fn test_make_parallel() {
+        let results = make_parallel(100);
+        for i in 1..20 {
+            assert_eq!(results[i - 1], fizz_buzz(i as i64));
         }
     }
 }
