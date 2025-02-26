@@ -7,11 +7,18 @@ struct Cli {
     iter_to: i64,
 }
 
+enum FizzBuzz {
+    Fizz,
+    Buzz,
+    FizzBuzz,
+    Number(i64),
+}
+
 fn fizz_buzz(n: i64) -> String {
     match (n % 3 == 0, n % 5 == 0) {
-        (true, true) => "FizzBuzz".to_string(),
-        (true, false) => "Fizz".to_string(),
-        (false, true) => "Buzz".to_string(),
+        (true, true) => String::from("FizzBuzz"),
+        (true, false) => String::from("Fizz"),
+        (false, true) => String::from("Buzz"),
         (false, false) => n.to_string(),
     }
 }
