@@ -15,7 +15,7 @@ fn fizz_buzz(n: i64) -> String {
     } else if n % 5 == 0 {
         "Buzz".to_string()
     } else {
-        return n.to_string();
+        n.to_string()
     }
 }
 
